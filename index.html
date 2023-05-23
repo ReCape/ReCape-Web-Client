@@ -29,14 +29,14 @@
     <h5>Your model list is loading...</h5>
   </div>
   
-  <button onclick="do_with_loader(update_models())">Update Model Configuration</button>
+  <button onclick="do_with_loader(update_models)">Update Model Configuration</button>
   
   <h3>Upload New</h3>
   
   <h4>Model file (.cfg)</h4>
-  <input type="file" id="new-model-cfg" accept=".cfg">
+  <input type="file" id="new-model-cfg" name="model" accept=".cfg">
   <h4>Texture file (.png)</h4>
-  <input type="file" id="new-model-texture" accept=".png">
+  <input type="file" id="new-model-texture" name="texture" accept=".png">
   <br>
   <button onclick="do_with_loader(uploadModel);">Upload</button>
 </div>

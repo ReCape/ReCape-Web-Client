@@ -1,9 +1,11 @@
-var _DEBUG = false;
+var _DEBUG = true;
 
 var rcURL = "https://recape-server.boyne.dev"
 
 var models = {}
 var modelChecks = {}
+
+let modelContainer = document.getElementById("model-list");
 
 function show_notification(text) {
   let notification = document.createElement("div");
@@ -58,7 +60,7 @@ function loginCode() {
   
 }
 
-function parse_login(json) {
+async function parse_login(json) {
   //Cookies.set("token", token);
   //Cookies.set("uuid", uuid);
   
@@ -72,7 +74,7 @@ function parse_login(json) {
       Cookies.set("uuid", json["uuid"]);
       Cookies.set("username", document.getElementById("username").value);
       show_notification("Successfully connected your account! Welcome to ReCape.");
-      login();
+      await login();
     }
     else if (json["status"] == "failure") {
       show_notification(json["error"]);
@@ -112,6 +114,8 @@ async function login() {
         document.getElementById("loading-popup").style.opacity = "0";
         
         document.body.style.pointerEvents = "all";
+
+        loadClientMenu()
       });
   } else {
     console.log("No token and/or no UUID");
@@ -150,8 +154,13 @@ async function start() {
   console.log("Logging in...")
   
   if (!_DEBUG) {
-    login()
-    .then(response => loadClientMenu())
+
+    try {
+      await login();
+    } catch (e) {
+      console.log(e);
+    }
+
   } else {
     
     show_notification("ReCape is currently in debug mode!");
@@ -257,8 +266,6 @@ function updateModelView() {
   console.log(models);
   
   modelChecks = {}
-  
-  let modelContainer = document.getElementById("model-list");
   modelContainer.innerHTML = "";
   
   Object.keys(models).forEach(model => {
@@ -274,7 +281,7 @@ function updateModelView() {
     let modelCheck = document.createElement("input");
     modelCheck.type = "checkbox";
     modelCheck.innerText = "Enabled?"
-    modelCheck.value = models[model];
+    modelCheck.checked = models[model];
     modelEl.appendChild(modelCheck);
     
     modelContainer.appendChild(modelEl);
@@ -285,6 +292,7 @@ function updateModelView() {
 }
 
 async function loadModels() {
+  try {
   let response = await fetch(rcURL + '/account/get_config', {
     method: 'GET',
     headers: {
@@ -308,6 +316,9 @@ async function loadModels() {
   } else {
     modelContainer.innerHTML = "<h4>You don't have any models yet.</h4>";
   }
+} catch (e) {
+  console.log(e);
+}
 }
 
 async function uploadModel() {
@@ -316,8 +327,8 @@ async function uploadModel() {
   var data = new FormData()
   let model = document.getElementById("new-model-cfg").files[0];
   let texture = document.getElementById("new-model-texture").files[0];
-  data.append('files[]', model, "model")
-  data.append('files[]', texture, "texture")
+  data.append('model', model, model.name)
+  data.append('texture', texture, "texture.png")
 
   let response = await fetch(rcURL + '/account/upload_cosmetic', {
     method: 'POST',
@@ -325,6 +336,33 @@ async function uploadModel() {
     headers: {
       "token": Cookies.get("token"),
       "uuid": Cookies.get("uuid")
+    }
+  })
+  
+  let json = await response.json()
+  
+  if (json["status"] == "success") {
+      show_notification("Your model has been uploaded.");
+    } else {
+      show_notification(json["error"]);
+    }
+}
+
+async function update_models() {
+
+  let data = {}
+
+  Object.keys(modelChecks).forEach(model => {
+    data[model] = modelChecks[model].checked;
+  })
+
+  let response = await fetch(rcURL + '/account/set_config', {
+    method: 'POST',
+    body: data,
+    headers: {
+      "token": Cookies.get("token"),
+      "uuid": Cookies.get("uuid"),
+      "config": JSON.stringify(data)
     }
   })
   

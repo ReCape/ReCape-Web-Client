@@ -158,3 +158,21 @@ input[type=file]::file-selector-button {
   box-shadow: 0 0 4px 0 black;
   border-radius: 10px;
 }
+
+#model-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #222;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.model {
+  box-shadow: 0 0 4px 0 black;
+  margin: 4px;
+  border-radius: 10px;
+}
