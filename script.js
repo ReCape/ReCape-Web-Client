@@ -1,4 +1,4 @@
-var _DEBUG = true;
+var _DEBUG = false;
 
 var rcURL = "https://recape-server.boyne.dev"
 
