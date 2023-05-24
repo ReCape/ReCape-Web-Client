@@ -23,11 +23,9 @@ async function username_to_uuid(username) {
   return res.json();
 }
 
-function loginMS() {
+async function loginMS() {
   
-  console.log("Querying...");
-  
-    let response = fetch(rcURL + "/authenticate/ms_login", {
+  response = await fetch(rcURL + "/authenticate/ms_login", {
       headers: {
         "email": document.getElementById("login-ms-email").value,
         "password": document.getElementById("login-ms-password").value,
@@ -35,28 +33,22 @@ function loginMS() {
         "source": "ReCape Web Client"
       }
   })
-  .then((response) => response.text())
-  .then((json) => parse_login(json));
-  
-  console.log("Done. Response: " + response + ". Waiting to complete...")
+  let json = await response.text();
+  await parse_login(json);
   
 }
 
-function loginCode() {
+async function loginCode() {
   
-  console.log("Querying...");
-  
-    let response = fetch(rcURL + "/authenticate/server_code", {
+    response = await fetch(rcURL + "/authenticate/server_code", {
       headers: {
         "code": document.getElementById("login-code").value,
         "username": document.getElementById("username").value,
         "source": "ReCape Web Client"
       }
   })
-  .then((response) => response.text())
-  .then((json) => parse_login(json));
-  
-  console.log("Done. Response: " + response + ". Waiting to complete...")
+  json = await response.text()
+  await parse_login(json);
   
 }
 
@@ -66,10 +58,8 @@ async function parse_login(json) {
   
   try {
     json = JSON.parse(json);
-    console.log(json);
     
     if (json["status"] == "success") {
-      console.log(json["token"]);
       Cookies.set("token", json["token"]);
       Cookies.set("uuid", json["uuid"]);
       Cookies.set("username", document.getElementById("username").value);
@@ -82,45 +72,43 @@ async function parse_login(json) {
     
     
   } catch (e) {
-    console.log("OOPS!!!!!!!!: " + e);
+    console.log(e);
     show_notification("Something went wrong.");
   }
 }
 
 function verify_token() {
   
-}
+} // :)
 
 async function login() {
   let token = Cookies.get("token");
   let uuid = Cookies.get("uuid");
   
   if (token != undefined && uuid != undefined) {
-      fetch(rcURL + "/authenticate/check_token", {
+      let response = await fetch(rcURL + "/authenticate/check_token", {
       headers: {
         "token": token,
         "username": Cookies.get("username"),
         "uuid": uuid.replaceAll("-", "")
       }
       })
-      .then((response) => response.json())
-      .then((json) => {
-        
-        if (json["result"] == "valid") {
-          document.getElementById("login-popup").style.opacity = "0";
-          document.getElementById("login-popup").style.pointerEvents = "none";
-        }
-        
-        document.getElementById("loading-popup").style.opacity = "0";
-        
-        document.body.style.pointerEvents = "all";
+      let json = await response.json()
+          
+      if (json["result"] == "valid") {
+        document.getElementById("login-popup").style.opacity = "0";
+        document.getElementById("login-popup").style.pointerEvents = "none";
+      }
+      
+      document.getElementById("loading-popup").style.opacity = "0";
+      
+      document.body.style.pointerEvents = "all";
 
-        loadClientMenu()
-      });
+      loadClientMenu()
   } else {
-    console.log("No token and/or no UUID");
-    console.log(token);
-    console.log(uuid);
+    document.getElementById("loading-popup").style.opacity = "0";    
+    document.getElementById("loading-popup").style.pointerEvents = "none";    
+    document.body.style.pointerEvents = "all";
   }
 }
 
@@ -151,7 +139,6 @@ function loadClientMenu() {
 }
 
 async function start() {
-  console.log("Logging in...")
   
   if (!_DEBUG) {
 
@@ -180,16 +167,12 @@ async function do_with_loader(func) {
   document.getElementById("loading-popup").style.opacity = "1";
   document.getElementById("loading-popup").style.pointerEvents = "all";
   
-  console.log("Running with loader...")
-  
   try {
     await func();
   } catch (e) {
     show_notification("An unknown error occurred while doing that.");
     console.log(e);
   }
-  
-  console.log("Done.")
   
   document.getElementById("loading-popup").style.opacity = "0";
   document.getElementById("loading-popup").style.pointerEvents = "none"; 
@@ -263,7 +246,6 @@ async function setCloaksPlusCape() {
 }
 
 function updateModelView() {
-  console.log(models);
   
   modelChecks = {}
   modelContainer.innerHTML = "";
