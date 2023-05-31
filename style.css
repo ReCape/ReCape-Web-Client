@@ -176,3 +176,10 @@ input[type=file]::file-selector-button {
   margin: 4px;
   border-radius: 10px;
 }
+
+.model-delete {
+  display: block;
+  width: auto;
+  height: 30px;
+  color: red;
+}

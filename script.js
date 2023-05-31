@@ -193,6 +193,13 @@ async function uploadCape() {
       "cape_type": "cape"
     }
   })
+
+  let status = await response.status
+
+  if (status == 413) {
+    show_notification("That file was too large.");
+    return;
+  }
   
   let json = await response.json()
   
@@ -265,6 +272,15 @@ function updateModelView() {
     modelCheck.innerText = "Enabled?"
     modelCheck.checked = models[model];
     modelEl.appendChild(modelCheck);
+
+    let modelDelete = document.createElement("ion-icon")
+    modelDelete.classList.add("model-delete")
+    modelDelete.setAttribute("name", "close-outline")
+    modelDelete.model = model
+    modelDelete.onclick = async function() {
+      await do_with_loader(async () => {await removeModel(this.model); await loadModels()});
+    }
+    modelEl.appendChild(modelDelete)
     
     modelContainer.appendChild(modelEl);
     
@@ -320,11 +336,19 @@ async function uploadModel() {
       "uuid": Cookies.get("uuid")
     }
   })
+
+  let status = await response.status
+
+  if (status == 413) {
+    show_notification("One of those files was too large.");
+    return;
+  }
   
   let json = await response.json()
   
   if (json["status"] == "success") {
       show_notification("Your model has been uploaded.");
+      await loadModels();
     } else {
       show_notification(json["error"]);
     }
@@ -355,6 +379,30 @@ async function update_models() {
     } else {
       show_notification(json["error"]);
     }
+}
+
+async function removeModel(model) {
+    show_notification("Removing the model \"" + model + "\"...");
+  
+    let response = await fetch(rcURL + '/account/delete_cosmetic', {
+      headers: {
+        "token": Cookies.get("token"),
+        "uuid": Cookies.get("uuid"),
+        "model": model
+      }
+    })
+    
+    let json = await response.json()
+    
+    if (json["status"] == "success") {
+        show_notification("Your model has been removed.");
+      } else {
+        show_notification(json["error"]);
+      }
+}
+
+function openCape() {
+  window.location.href = "http://131.150.27.79/capes/" + Cookies.get("username") + ".png"
 }
 
 start();
