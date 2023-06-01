@@ -1,6 +1,10 @@
 var _DEBUG = false;
 
-var rcURL = "https://recape-server.boyne.dev"
+if (_DEBUG) {
+var rcURL = "https://localhost";
+} else {
+  var rcURL = "https://recape-server.boyne.dev";
+}
 
 var models = {}
 var modelChecks = {}
