@@ -144,7 +144,7 @@ function loadClientMenu() {
 
 async function start() {
   
-  if (!_DEBUG) {
+  if (!_DEBUG || _DEBUG) {
 
     try {
       await login();
@@ -405,8 +405,11 @@ async function removeModel(model) {
       }
 }
 
-function openCape() {
-  window.location.href = "http://131.150.27.79/capes/" + Cookies.get("username") + ".png"
+async function openCape() {
+  const resolver = new doh.DohResolver('https://1.1.1.1/dns-query')
+  let response = await resolver.query('recape-server.boyne.dev')
+  let ip = response.answers[0].data;
+  window.location.href = "http://" + ip + "/capes/" + Cookies.get("username") + ".png"
 }
 
 start();
