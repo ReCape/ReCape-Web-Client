@@ -1,4 +1,5 @@
 var _DEBUG = false;
+var COOKIE_EXPIRY = 30;
 
 if (_DEBUG) {
 var rcURL = "https://localhost";
@@ -64,9 +65,9 @@ async function parse_login(json) {
     json = JSON.parse(json);
     
     if (json["status"] == "success") {
-      Cookies.set("token", json["token"]);
-      Cookies.set("uuid", json["uuid"]);
-      Cookies.set("username", document.getElementById("username").value);
+      Cookies.set("token", json["token"], {expires: COOKIE_EXPIRY});
+      Cookies.set("uuid", json["uuid"], {expires: COOKIE_EXPIRY});
+      Cookies.set("username", document.getElementById("username").value, {expires: COOKIE_EXPIRY});
       show_notification("Successfully connected your account! Welcome to ReCape.");
       await login();
     }
