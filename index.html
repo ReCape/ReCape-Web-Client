@@ -50,38 +50,30 @@
 
 <div id="login-popup">
   <h2>Login to ReCape</h2>
-  <p>We need to make sure you own your Minecraft account. You can use a login code from our authentication Minecraft server, or just use your Microsoft account details if you're feeling lazy and trusting.</p>
+  <p>We need to make sure you own your Minecraft account. You can use a login code from our authentication Minecraft server.</p>
   
-  <h4>If you don't feel comfortable providing your Microsoft account details, just use the authentication code!</h4>
-
   <h5>Disclaimer: By logging into ReCape, you agree to the use of cookies to keep you logged in. We do not use cookies for tracking, advertisements, or any purpose other than to serve the function of the client.</h5>
 
-  <h4>Username</h4>
-  <input id="username" placeholder="YourMinecraftUsername"></input>
+  <div class="login-method">
+    <h4>Step 1</h4>
+    <h3>Username</h3>
+    <input id="username" placeholder="YourMinecraftUsername"></input>
+  </div>
 
   <div class="login-method">
-    <h3>Use an authentication code</h3>
-    <h4>Secure!</h4>
+    <h4>Step 2</h4>
+    <h3>Authentication code</h3>
     <p>Open Minecraft and connect to <code>recape-server.boyne.dev</code>, then type the code you get here</p>
     
     <h4>Login Code</h4>
     <input id="login-code" placeholder="000000000" onkeypress='only_number(event)'></input>
-    
-  <button onclick="do_with_loader(loginCode)">Login With Code</button>
   </div>
 
-  <h1>OR</h1>
-  
   <div class="login-method">
-  <h3>Use your Microsoft account</h3>
-  <h4>Convenient!</h4>
-  <h4>Email Address</h4>
-  <input id="login-ms-email" placeholder="your.email@gmail.com"></input>
-   
-  <h4>Password</h4>
-  <input id="login-ms-password" placeholder="yourpassword952!" type="password"></input>
-
-  <button onclick="do_with_loader(loginMS)">Login With Microsoft</button>
+    <h4>Step 3</h4>
+    <h3>Go!</h3>
+    <button onclick="do_with_loader(loginCode)">Login To ReCape!</button>
+  </div>
   
 </div>
   
