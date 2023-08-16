@@ -10,6 +10,8 @@ var rcURL = "https://localhost";
 var models = {}
 var modelChecks = {}
 
+var skinViewer = null;
+
 let modelContainer = document.getElementById("model-list");
 
 function show_notification(text) {
@@ -19,6 +21,43 @@ function show_notification(text) {
   document.getElementById("notifications").appendChild(notification);
   
   setTimeout(x => {notification.remove()}, 5000)
+}
+
+function fetch_cape() {
+  var xhr = new XMLHttpRequest();
+  xhr.responseType = 'blob'; //so you can access the response like a normal URL
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+          skinViewer.loadCape(URL.createObjectURL(xhr.response)).catch((error) => {
+            if ((error + "").indexOf("1x1") != -1) {
+              document.getElementById("cape-error").innerText = "You have no cape.";
+
+            } else {
+              document.getElementById("cape-error").innerText = "Your cape could not be loaded. This is likely due to it being improperly formatted (the wrong size). It should still work in-game!";
+              console.log("Error: " + error)
+            }
+      });
+  };
+  }; 
+  xhr.onloadend = function() {
+    if (xhr.status == 404) {
+      document.getElementById("cape-error").innerText = "You have no cape.";
+    }
+  }
+  xhr.open('GET', rcURL + "/account/get_cape", true);
+  xhr.setRequestHeader('token', Cookies.get("token"));
+  xhr.setRequestHeader('uuid', Cookies.get("uuid"));
+
+  xhr.send();
+}
+
+function load_skin() {
+  skinViewer = new skinview3d.SkinViewer({
+		canvas: document.getElementById("skin-container"),
+		width: 300,
+		height: 400,
+		skin: "https://mc-heads.net/download/" + Cookies.get("username")
+	});
 }
 
 async function username_to_uuid(username) {
@@ -136,6 +175,8 @@ function only_number(evt) {
 }
 
 function loadClientMenu() {
+  load_skin();
+  fetch_cape();
   loadModels();
   document.getElementById("loading-popup").style.opacity = "0";
   document.getElementById("loading-popup").style.pointerEvents = "none"; 
@@ -210,6 +251,7 @@ async function uploadCape() {
   
   if (json["status"] == "success") {
       show_notification("Your cape has been changed.");
+      fetch_cape();
     } else {
       show_notification(json["error"]);
     }
