@@ -4,25 +4,30 @@
     <title>ReCape Client</title>
     <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
 
   </head>
   <body>
+    <div id="client-view">
+      <div id="preview">
+
+      </div>
+      <div id="side">
+    
     <h1>ReCape Client</h1>
-<h2 id="logged-in-as">Logged in as </h2>
+<h2 id="logged-in-as">...</h2>
 
 <div id="client-section">
   
   <h2>Cape</h2>
-  <h3>Your Current Cape</h3>
-  <canvas id="skin-container"></canvas>
-  <h4 id="cape-error"></h4>
   <button onclick="do_with_loader(setNoCape)">Don't Use a Cape</button>
   <button onclick="do_with_loader(setCloaksPlusCape)">Use Cloaks+ Cape</button>
-  
-  <h3>Upload New</h3>
-  
-  <input type="file" id="new-cape" accept=".png">
-  <button onclick="do_with_loader(uploadCape);">Upload</button>
+  <button onclick="document.getElementById('new-cape').click()">Upload New</button>
+
+  <input type="file" id="new-cape" accept=".png" onchange="do_with_loader(uploadCape);" hidden>
 </div>
 
 <div id="client-section">
@@ -33,9 +38,9 @@
     <h5>Your model list is loading...</h5>
   </div>
   
-  <button onclick="do_with_loader(update_models)">Update Model Configuration</button>
+  <button onclick="do_with_loader(update_models)">Save</button>
   
-  <h3>Upload New</h3>
+  <h3>Add a Model</h3>
   
   <h4>Model file (.cfg)</h4>
   <input type="file" id="new-model-cfg" name="model" accept=".cfg">
@@ -43,6 +48,8 @@
   <input type="file" id="new-model-texture" name="texture" accept=".png">
   <br>
   <button onclick="do_with_loader(uploadModel);">Upload</button>
+</div>
+</div>
 </div>
 
 <div id="loading-popup">
@@ -86,11 +93,18 @@
 <div id="notifications">
 </div>
 
-<script src=" https://cdn.jsdelivr.net/npm/skinview3d@3.0.0-alpha.1/bundles/skinview3d.bundle.min.js "></script>
+
 <script src=" https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dohjs@latest/dist/doh.min.js"></script>
+
+<script src="three.js"></script>
+<script src="orbit.js"></script>
+
+<script src="cfgrender.js"></script>
 <script src="script.js"></script>
+
+
   </body>
 </html>

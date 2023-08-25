@@ -10,8 +10,6 @@ var rcURL = "https://localhost";
 var models = {}
 var modelChecks = {}
 
-var skinViewer = null;
-
 let modelContainer = document.getElementById("model-list");
 
 function show_notification(text) {
@@ -28,15 +26,7 @@ function fetch_cape() {
   xhr.responseType = 'blob'; //so you can access the response like a normal URL
   xhr.onreadystatechange = function () {
       if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-          skinViewer.loadCape(URL.createObjectURL(xhr.response)).catch((error) => {
-            if ((error + "").indexOf("1x1") != -1) {
-              document.getElementById("cape-error").innerText = "You have no cape.";
-
-            } else {
-              document.getElementById("cape-error").innerText = "Your cape could not be loaded. This is likely due to it being improperly formatted (the wrong size). It should still work in-game!";
-              console.log("Error: " + error)
-            }
-      });
+          loadCape(URL.createObjectURL(xhr.response));
   };
   }; 
   xhr.onloadend = function() {
@@ -47,17 +37,55 @@ function fetch_cape() {
   xhr.open('GET', rcURL + "/account/get_cape", true);
   xhr.setRequestHeader('token', Cookies.get("token"));
   xhr.setRequestHeader('uuid', Cookies.get("uuid"));
+  xhr.setRequestHeader("Cache-Control", "no-cache, no-store, max-age=0");
+    
+  // fallbacks for IE and older browsers:
+  xhr.setRequestHeader("Expires", "Tue, 01 Jan 1980 1:00:00 GMT");
+  xhr.setRequestHeader("Pragma", "no-cache");
 
   xhr.send();
 }
 
-function load_skin() {
-  skinViewer = new skinview3d.SkinViewer({
-		canvas: document.getElementById("skin-container"),
-		width: 300,
-		height: 400,
-		skin: "https://mc-heads.net/download/" + Cookies.get("username")
-	});
+function fetch_model_cfg(model, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.responseType = 'blob'; //so you can access the response like a normal URL
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+          callback(URL.createObjectURL(xhr.response));
+      }
+  };
+  xhr.open('GET', rcURL + "/account/get_cosmetic_cfg", true);
+  xhr.setRequestHeader('token', Cookies.get("token"));
+  xhr.setRequestHeader('uuid', Cookies.get("uuid"));
+  xhr.setRequestHeader('model', model);
+  xhr.setRequestHeader("Cache-Control", "no-cache, no-store, max-age=0");
+    
+  // fallbacks for IE and older browsers:
+  xhr.setRequestHeader("Expires", "Tue, 01 Jan 1980 1:00:00 GMT");
+  xhr.setRequestHeader("Pragma", "no-cache");
+
+  xhr.send();
+}
+
+function fetch_model_texture(model, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.responseType = 'blob'; //so you can access the response like a normal URL
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+          callback(URL.createObjectURL(xhr.response));
+      }
+  };
+  xhr.open('GET', rcURL + "/account/get_cosmetic_texture", true);
+  xhr.setRequestHeader('token', Cookies.get("token"));
+  xhr.setRequestHeader('uuid', Cookies.get("uuid"));
+  xhr.setRequestHeader('model', model);
+  xhr.setRequestHeader("Cache-Control", "no-cache, no-store, max-age=0");
+    
+  // fallbacks for IE and older browsers:
+  xhr.setRequestHeader("Expires", "Tue, 01 Jan 1980 1:00:00 GMT");
+  xhr.setRequestHeader("Pragma", "no-cache");
+
+  xhr.send();
 }
 
 async function username_to_uuid(username) {
@@ -175,9 +203,15 @@ function only_number(evt) {
 }
 
 function loadClientMenu() {
-  load_skin();
+  let viewer = document.getElementsByClassName("cfgviewer")
+  if (viewer.length > 0) {
+    viewer[0].remove()
+  }
+
+  createScene();
   fetch_cape();
-  loadModels();
+  loadSkin("https://mc-heads.net/skin/" + Cookies.get("uuid"))
+  loadModelList();
   document.getElementById("loading-popup").style.opacity = "0";
   document.getElementById("loading-popup").style.pointerEvents = "none"; 
     
@@ -313,30 +347,44 @@ function updateModelView() {
     let modelTitle = document.createElement("h3");
     modelTitle.innerText = model;
     modelEl.appendChild(modelTitle);
+
+    let modelControls = document.createElement("div");
+    modelControls.classList.add("model-controls")
+    modelEl.appendChild(modelControls);
     
     let modelCheck = document.createElement("input");
     modelCheck.type = "checkbox";
     modelCheck.innerText = "Enabled?"
     modelCheck.checked = models[model];
-    modelEl.appendChild(modelCheck);
+    modelControls.appendChild(modelCheck);
 
     let modelDelete = document.createElement("ion-icon")
     modelDelete.classList.add("model-delete")
     modelDelete.setAttribute("name", "close-outline")
     modelDelete.model = model
     modelDelete.onclick = async function() {
-      await do_with_loader(async () => {await removeModel(this.model); await loadModels()});
+      await do_with_loader(async () => {await removeModel(this.model); await loadModelList()});
     }
-    modelEl.appendChild(modelDelete)
+    modelControls.appendChild(modelDelete)
     
     modelContainer.appendChild(modelEl);
     
     modelChecks[model] = modelCheck;
+
+    // Load it into the viewer
+    if (models[model]) {
+      fetch_model_cfg(model, (cfg) => {
+        fetch_model_texture(model, (texture) => {
+          console.log(model, texture)
+          loadModelFromPath(cfg, texture)
+        })
+      });
+  }
     
   });
 }
 
-async function loadModels() {
+async function loadModelList() {
   try {
   let response = await fetch(rcURL + '/account/get_config', {
     method: 'GET',
@@ -395,7 +443,7 @@ async function uploadModel() {
   
   if (json["status"] == "success") {
       show_notification("Your model has been uploaded.");
-      await loadModels();
+      await loadModelList();
     } else {
       show_notification(json["error"]);
     }
@@ -422,7 +470,8 @@ async function update_models() {
   let json = await response.json()
   
   if (json["status"] == "success") {
-      show_notification("Your model has been uploaded.");
+      show_notification("Your models have been updated.");
+      loadClientMenu();
     } else {
       show_notification(json["error"]);
     }

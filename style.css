@@ -26,6 +26,14 @@ body {
   pointer-events: none;
 }
 
+#client-view {
+  display: flex;
+}
+
+.model-controls {
+  display: flex;
+}
+
 #loading-popup {
   width: 100vw;
   height: 100vh;
@@ -49,8 +57,8 @@ body {
   background-color: rgba(0, 0, 0, 0.8);
   border: 2px solid black;
   backdrop-filter: blur(40px);
-  width: 80vw;
-  height: 80vh;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   position: fixed;
   z-index: 2;
@@ -180,7 +188,7 @@ input[type=file]::file-selector-button {
 
 .model-delete {
   display: block;
-  width: auto;
+  width: 30px;
   height: 30px;
   color: red;
 }
