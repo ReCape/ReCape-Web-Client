@@ -208,7 +208,7 @@ function loadClientMenu() {
     viewer[0].remove()
   }
 
-  createScene();
+  createScene(0.4);
   fetch_cape();
   loadSkin("https://mc-heads.net/skin/" + Cookies.get("uuid"))
   loadModelList();
