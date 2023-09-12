@@ -70,7 +70,6 @@ a:visited {
   height: 100vh;
   display: flex;
   background-color: var(--loading-tint);
-  backdrop-filter: blur(10px);
   position: fixed;
   transition: 0.2s;
   top: 0;
@@ -87,7 +86,6 @@ a:visited {
   pointer-events: all;
   background-color: var(--popup-tint);
   border: 2px solid black;
-  backdrop-filter: blur(40px);
   width: 100vw;
   height: 100vh;
   display: flex;
