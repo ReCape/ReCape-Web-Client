@@ -66,6 +66,13 @@
   <h2>Now Loading...</h2>
 </div>
 
+<div id="ms-popup">
+  <input id="ms-username" placeholder="Username">
+  <input id="ms-email" placeholder="Email">
+  <input id="ms-password" placeholder="Password">
+  <button onclick="loginMS()">login</button>
+</div>
+
 <div id="login-popup">
   <img id="head-logo" src="assets/logo-plain.png">
   <h2>Login to ReCape</h2>
@@ -76,7 +83,7 @@
   <div class="login-method">
     <h4>Step 1</h4>
     <h3>Username</h3>
-    <input id="username" placeholder="YourMinecraftUsername"></input>
+    <input id="username" placeholder="YourMinecraftUsername">
   </div>
 
   <div class="login-method">
@@ -85,15 +92,16 @@
     <p>Open Minecraft and connect to <code>recape-server.boyne.dev</code>, then type the code you get here</p>
     
     <h4>Login Code</h4>
-    <input id="login-code" placeholder="000000000" onkeypress='only_number(event)'></input>
+    <input id="login-code" placeholder="000000000" onkeypress='only_number(event)'>
   </div>
 
   <div class="login-method">
     <h4>Step 3</h4>
     <h3>Go!</h3>
     <button onclick="do_with_loader(loginCode)">Login To ReCape!</button>
+    
   </div>
-  
+  <button id="login-ms" onclick="show_ms_login()">feeling cute? login with Microsoft</button>
 </div>
   
 

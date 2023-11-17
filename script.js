@@ -1,4 +1,4 @@
-var _DEBUG = false;
+var _DEBUG = true;
 var COOKIE_EXPIRY = 30;
 
 if (_DEBUG) {
@@ -31,7 +31,7 @@ function fetch_cape() {
   }; 
   xhr.onloadend = function() {
     if (xhr.status == 404) {
-      document.getElementById("cape-error").innerText = "You have no cape.";
+      show_notification("You have no cape!");
     }
   }
   xhr.open('GET', rcURL + "/account/get_cape", true);
@@ -95,17 +95,22 @@ async function username_to_uuid(username) {
   return res.json();
 }
 
+function show_ms_login() {
+  document.getElementById("ms-popup").classList.toggle("showing");
+}
+
 async function loginMS() {
   
   response = await fetch(rcURL + "/authenticate/ms_login", {
       headers: {
-        "email": document.getElementById("login-ms-email").value,
-        "password": document.getElementById("login-ms-password").value,
-        "username": document.getElementById("username").value,
-        "source": "ReCape Web Client"
+        "email": document.getElementById("ms-email").value,
+        "password": document.getElementById("ms-password").value,
+        "username": document.getElementById("ms-username").value,
+        "source": "ReCape Web Client (Microsoft Login)"
       }
   })
   let json = await response.text();
+  document.getElementById("ms-popup").classList.remove("showing");
   await parse_login(json);
   
 }
@@ -134,7 +139,7 @@ async function parse_login(json) {
     if (json["status"] == "success") {
       Cookies.set("token", json["token"], {expires: COOKIE_EXPIRY});
       Cookies.set("uuid", json["uuid"], {expires: COOKIE_EXPIRY});
-      Cookies.set("username", document.getElementById("username").value, {expires: COOKIE_EXPIRY});
+      Cookies.set("username", json["username"], {expires: COOKIE_EXPIRY});
       show_notification("Successfully connected your account! Welcome to ReCape.");
       await login();
     }
@@ -270,7 +275,7 @@ async function uploadCape() {
     headers: {
       "token": Cookies.get("token"),
       "uuid": Cookies.get("uuid"),
-      "cape_type": "cape"
+      "capetype": "cape"
     }
   })
 
@@ -299,7 +304,7 @@ async function setNoCape() {
     headers: {
       "token": Cookies.get("token"),
       "uuid": Cookies.get("uuid"),
-      "cape_type": "none"
+      "capetype": "none"
     }
   })
   
@@ -320,7 +325,7 @@ async function setCloaksPlusCape() {
     headers: {
       "token": Cookies.get("token"),
       "uuid": Cookies.get("uuid"),
-      "cape_type": "cloaksplus"
+      "capetype": "cloaksplus"
     }
   })
   
