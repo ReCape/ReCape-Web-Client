@@ -1,4 +1,4 @@
-var _DEBUG = true;
+var _DEBUG = false;
 var COOKIE_EXPIRY = 30;
 
 if (_DEBUG) {
